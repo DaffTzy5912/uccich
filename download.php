@@ -4,20 +4,23 @@ if (!isset($_GET['url'])) {
 }
 
 $url = $_GET['url'];
-
-// Ambil nama file dari URL
 $fileName = basename(parse_url($url, PHP_URL_PATH));
 
-// Ambil isi file
-$image = @file_get_contents($url);
+// Coba ambil file pakai cURL
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // follow redirect kalau ada
+$image = curl_exec($ch);
+$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+curl_close($ch);
 
 if ($image === false) {
     die('Gagal mengambil gambar.');
 }
 
-// Set Header buat download
+// Set header buat force download
 header('Content-Description: File Transfer');
-header('Content-Type: application/octet-stream');
+header('Content-Type: ' . $contentType);
 header('Content-Disposition: attachment; filename="' . $fileName . '"');
 header('Content-Transfer-Encoding: binary');
 header('Expires: 0');
@@ -25,7 +28,7 @@ header('Cache-Control: must-revalidate');
 header('Pragma: public');
 header('Content-Length: ' . strlen($image));
 
-// Output file
+// Output file gambar
 echo $image;
 exit;
 ?>
