@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek ID Channel WhatsApp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #25D366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #128C7E;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Cek ID Channel WhatsApp</h1>
+</header>
+
+<div class="container">
+    <label for="channelLink">Masukkan Link Channel WhatsApp:</label>
+    <input type="text" id="channelLink" class="input-field" placeholder="Contoh: https://whatsapp.com/channel/0029Vafs40K4dTnIXMqfQa2Q">
+    <button class="button" onclick="cekIdChannel()">Cek ID Channel</button>
+
+    <div id="result" class="result" style="display: none;"></div>
+</div>
+
+<script>
+    async function cekIdChannel() {
+        const channelLink = document.getElementById("channelLink").value;
+        const resultDiv = document.getElementById("result");
+        
+        if (!channelLink) {
+            resultDiv.style.display = 'none';
+            alert("Silakan masukkan link channel WhatsApp.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/cekidch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ link: channelLink }),
+            });
+            const data = await response.json();
+            
+            if (data.error) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<p class="error">❌ Error: ${data.error}</p>`;
+            } else {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <p><strong>📛 Name:</strong> ${data.name}</p>
+                    <p><strong>🪪 ID Channel:</strong> ${data.id}</p>
+                `;
+            }
+        } catch (err) {
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<p class="error">❌ Terjadi kesalahan saat memeriksa channel.</p>`;
+        }
+    }
+</script>
+
+</body>
+</html>
